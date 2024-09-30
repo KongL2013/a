@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Tournament Earnings Tracker</title>
+    <!-- Add manifest link -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Theme and app colors -->
+    <meta name="theme-color" content="#007bff">
+
+    <!-- Icons for different devices -->
+    <link rel="icon" href="icons/icon-192x192.png" sizes="192x192" type="image/png">
+    <link rel="icon" href="icons/icon-512x512.png" sizes="512x512" type="image/png">
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 1.6rem;
+            text-align: center;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        #tournamentForm {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #fff;
+        }
+        #balance {
+            font-weight: bold;
+            color: #28a745;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Chess Tournament Earnings Tracker</h1>
+        
+        <h2>Current Balance: $<span id="balance">0</span></h2>
+
+        <h3>Add Tournament</h3>
+        <form id="tournamentForm">
+            <label for="name">Tournament Name:</label>
+            <input type="text" id="name" required>
+            <label for="amount">Prize Amount (positive for earnings, negative for losses):</label>
+            <input type="number" id="amount" required>
+            <button type="submit">Add Tournament</button>
+        </form>
+
+        <h3>Tournaments</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tournament Name</th>
+                    <th>Prize</th>
+                </tr>
+            </thead>
+            <tbody id="tournamentList">
+                <!-- Tournament entries will appear here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Initialize balance from localStorage
+        let balance = localStorage.getItem('balance') ? parseFloat(localStorage.getItem('balance')) : 0;
+        document.getElementById('balance').innerText = balance.toFixed(2);
+
+        // Initialize tournament list from localStorage
+        let tournaments = localStorage.getItem('tournaments') ? JSON.parse(localStorage.getItem('tournaments')) : [];
+
+        // Display stored tournaments
+        const tournamentList = document.getElementById('tournamentList');
+        function renderTournaments() {
+            tournamentList.innerHTML = ''; // Clear the table first
+            tournaments.forEach(tournament => {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${tournament.name}</td><td>$${tournament.amount.toFixed(2)}</td>`;
+                tournamentList.appendChild(row);
+            });
+        }
+
+        renderTournaments();
+
+        // Form submission handler
+        document.getElementById('tournamentForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            // Update balance
+            balance += amount;
+            document.getElementById('balance').innerText = balance.toFixed(2);
+
+            // Save balance to localStorage
+            localStorage.setItem('balance', balance.toFixed(2));
+
+            // Add new tournament to the list and save to localStorage
+            tournaments.push({ name, amount });
+            localStorage.setItem('tournaments', JSON.stringify(tournaments));
+
+            // Render updated list of tournaments
+            renderTournaments();
+
+            // Clear form
+            document.getElementById('tournamentForm').reset();
+        });
+    </script>
+</body>
+</html>
